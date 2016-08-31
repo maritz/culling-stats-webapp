@@ -1,0 +1,16 @@
+{
+  "name": "culling-stats-webapp",
+  "version": "1.0.0",
+  "description": "Webapp that can take culling logs, parses them and displays some stats",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "culling",
+    "theculling",
+    "stats"
+  ],
+  "author": "Moritz Peters",
+  "license": "MIT"
+}
