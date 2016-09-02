@@ -33,7 +33,7 @@ function handleFile(
   reader.onload = (event) => {
     let result: any;
     try {
-      result = parseLog(reader.result);
+      result = parseLog(reader.result, undefined);
     } catch (e) {
       errorHandler.call(reader, e);
       return;
@@ -68,16 +68,26 @@ onmessage = (event) => {
           fileSerialHandler(index);
           // todo: handle merging of data received.
         } else {
-          postMessage({
-            done,
-            type: 'done',
-          });
+          try {
+            postMessage({
+              done,
+              type: 'done',
+            });
+          } catch(error) {
+            postMessage({
+              error: error.message,
+              stack: error.stack,
+              type: 'error',
+            });
+          }
         }
       },
 
-      (error) => {
+      (error: Error) => {
+        console.log('Posting error');
         postMessage({
-          error,
+          error: error.message,
+          stack: error.stack,
           type: 'error',
         });
       }
