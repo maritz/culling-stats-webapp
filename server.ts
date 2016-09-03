@@ -2,19 +2,24 @@ import * as path from 'path';
 import * as express from 'express';
 import * as webpack from 'webpack';
 
-const config = require('./webpack.config.js');
+const app = express();
 
-let app = express();
-let compiler = webpack(config);
+if (process.env.NODE_ENV === 'production') {
+  app.use('/static', express.static(path.join(__dirname, 'dist')));
+} else {
 
-app.use(require('webpack-dev-middleware')(compiler, {
-  noInfo: false,
-  publicPath: config.output.publicPath,
-}));
+  const config = require('./webpack.config.js');
+  let compiler = webpack(config);
 
-app.use(require('webpack-hot-middleware')(compiler));
+  app.use(require('webpack-dev-middleware')(compiler, {
+    noInfo: false,
+    publicPath: config.output.publicPath,
+  }));
 
-app.use('/static', express.static(path.join(__dirname, 'src', 'client')));
+  app.use(require('webpack-hot-middleware')(compiler));
+
+  app.use('/static', express.static(path.join(__dirname, 'src', 'client')));
+}
 
 app.listen(3040, '0.0.0.0', (err: Error | string) => {
   if (err) {

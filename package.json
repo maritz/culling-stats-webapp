@@ -4,7 +4,8 @@
   "description": "Webapp that can take culling logs, parses them and displays some stats",
   "main": "dist/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "sh Makefile"
   },
   "keywords": [
     "culling",

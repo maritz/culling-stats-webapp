@@ -51,7 +51,6 @@ function fastConcat(array: Array<any>, otherArray: Array<any>) {
 
 
 onmessage = (event) => {
-
   const files: Array<File> = event.data;
 
   const totalResult: ICullingParser.IParseLogOutput = {
