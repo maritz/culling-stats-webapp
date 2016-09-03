@@ -39,6 +39,11 @@ export default class LogDropZone extends React.Component<IProps, IState> {
   }
 
   private onDrop(files: Array<File>) {
+    if (this.state.isParsingLogs) {
+      alert(`Wait for current parsing to finish!
+If it's stuck you can try reloading the website.
+If that doesn't help then report it as a bug, please! :-)`);
+    }
     this.setState({
       files,
       isParsingLogs: true,
@@ -112,8 +117,8 @@ export default class LogDropZone extends React.Component<IProps, IState> {
         disablePreview={true}
         accept='.log'>
         <div className={loadingClass}>
-          <div className='progress'>
-            <div className='progress-bar' role='progressbar'
+          <div className='progress progress-striped active'>
+            <div className='progress-bar progress-bar-info' role='progressbar'
               aria-valuenow={this.state.parsePercent} aria-valuemin='0'
               aria-valuemax='100' style={loadingBarWidthStyle}>
                 {this.state.parsePercent}%
@@ -123,10 +128,18 @@ export default class LogDropZone extends React.Component<IProps, IState> {
         </div>
         <div className={innerClassName}>
           <h2>Drag & Drop Victory.log files here</h2>
+          <form className='form-horizontal'>
+            <div className='form-group'>
+              <label className='col-sm-4 control-label'>
+                You can find your Culling logs here
+              </label>
+              <div className='col-xs-12 col-sm-5 col-md-4 col-lg-3'>
+                <input className='form-control' onClick={this.onClickInput.bind(this)} selected={true} readOnly={true}
+                  size={33} value='%localappdata%\\Victory\\Saved\\Logs' />
+              </div>
+            </div>
+          </form>
           <p className='lead'>
-            You can find your Culling logs here:&nbsp;
-            <input onClick={this.onClickInput.bind(this)} selected={true} readOnly={true}
-              size={33} value='%localappdata%\\Victory\\Saved\\Logs' />
             <br/>
             These files will <b>not</b> be uploaded, they will be processed in your browser and then displayed.
             When you leave this page, they are forgotten.
