@@ -5,7 +5,7 @@ import * as webpack from 'webpack';
 const app = express();
 
 if (process.env.NODE_ENV === 'production') {
-  app.use('/static', express.static(path.join(__dirname, 'dist')));
+  app.use('/static', express.static(path.join(__dirname, 'docs')));
 } else {
 
   const config = require('./webpack.config.js');
@@ -29,13 +29,3 @@ app.listen(3040, '0.0.0.0', (err: Error | string) => {
 
   console.log('Listening at http://0.0.0.0:3040');
 });
-
-/*import * as express from 'express';
-
-const app = express();
-
-app.use('/', express.static(__dirname + '/dist/client/'));
-
-app.listen(3040, '0.0.0.0');
-console.log('Listening on http://0.0.0.0:3040/');
-*/

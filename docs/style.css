@@ -1,0 +1,69 @@
+
+#content > .row .loader {
+  display: none;
+
+  background: rgba(200, 200, 200, 0.9);
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1; /* otherwise the input overlays it?!!?! oO */
+}
+#content > .row .loader.loading {
+  display: block;
+}
+
+#content > .row .loader.loading .progress {
+  position: absolute;
+  margin-top: -11px;
+  top: 50%;
+  width: 60%;
+  left: 50%;
+  margin-left: -30%;
+}
+
+.dropzone {
+  position: relative;
+}
+
+.dropzone .well {
+  min-height: 70vh;
+}
+
+.dropzone.minimized .well {
+  min-height: auto;
+}
+
+.dropzone.minimized h2 { /* minimized mode */
+  font-size: 22px;
+  margin-top: 10px;
+}
+
+.dropzone.minimized p { /* minimized mode */
+  font-size: 16px;
+  margin-bottom: 0px;
+}
+
+.dropzone > div {
+  border: 2px dashed #888888;
+}
+.dropzoneActive > div  {
+  background-color: #46b8da;
+}
+.dropzoneRejected > div  {
+  background-color: #46b8da;
+  /* Due to a bug in the handling in react-dropzone or chrome or something, all files are marked as rejected in chrome during drag */
+  /*background-color: #ec4844;*/
+}
+
+.dropzone input[readonly] {
+  background-color: #424242;
+  color: #c8c8c8;
+}
+
+.dropzone .progress img.grayFace {
+  position: absolute;
+  left: 50%;
+  top: 0;
+}
