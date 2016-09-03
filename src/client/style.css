@@ -27,6 +27,24 @@
   position: relative;
 }
 
+.dropzone .well {
+  min-height: 70vh;
+}
+
+.dropzone.minimized .well {
+  min-height: auto;
+}
+
+.dropzone.minimized h2 { /* minimized mode */
+  font-size: 22px;
+  margin-top: 10px;
+}
+
+.dropzone.minimized p { /* minimized mode */
+  font-size: 16px;
+  margin-bottom: 0px;
+}
+
 .dropzone > div {
   border: 2px dashed #888888;
 }
@@ -40,14 +58,6 @@
 .dropzone input[readonly] {
   background-color: #424242;
   color: #c8c8c8;
-}
-
-.dropzone .minimized h2 { /* minimized mode */
-  font-size: 22px;
-}
-
-.dropzone .minimized p { /* minimized mode */
-  font-size: 16px;
 }
 
 .dropzone .progress img.grayFace {

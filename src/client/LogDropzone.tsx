@@ -44,6 +44,9 @@ export default class LogDropZone extends React.Component<IProps, IState> {
 If it's stuck you can try reloading the website.
 If that doesn't help then report it as a bug, please! :-)`);
     }
+    if (!files[0] || !(files[0] instanceof File)) {
+      return this.onReject();
+    }
     this.setState({
       files,
       isParsingLogs: true,
@@ -100,16 +103,18 @@ If that doesn't help then report it as a bug, please! :-)`);
 
 
   public render() {
-    let innerClassName = 'minimized well well-sm';
-    if (!this.state.minimized) {
-      innerClassName = 'well';
+    let outerClassName = 'dropzone col-lg-12';
+    let innerClassName = 'well';
+    if (this.state.minimized) {
+      innerClassName += ' well-sm';
+      outerClassName += ' minimized';
     }
     const loadingClass = this.state.isParsingLogs ? 'loader loading' : 'loader';
     const loadingBarWidthStyle = { width: `${this.state.parsePercent}%` };
     return (
       <Dropzone
         onDrop={this.onDrop.bind(this)}
-        className='dropzone col-lg-12'
+        className={outerClassName}
         activeClassName='dropzoneActive'
         rejectClassName='dropzoneRejected'
         onDropRejected={this.onReject.bind(this)}
@@ -140,7 +145,6 @@ If that doesn't help then report it as a bug, please! :-)`);
             </div>
           </form>
           <p className='lead'>
-            <br/>
             These files will <b>not</b> be uploaded, they will be processed in your browser and then displayed.
             When you leave this page, they are forgotten.
           </p>
