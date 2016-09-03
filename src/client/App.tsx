@@ -7,7 +7,7 @@ interface IProps {
 };
 
 interface IState {
-  stats: ICullingParser.IParseLogOutput | null;
+  stats: ICullingParser.IParseLogResponseCloneable | null;
 };
 
 export default class App extends React.Component<IProps, IState> {
@@ -20,7 +20,7 @@ export default class App extends React.Component<IProps, IState> {
     };
   }
 
-  private onParsed(output: ICullingParser.IParseLogOutput) {
+  private onParsed(output: ICullingParser.IParseLogResponseCloneable) {
     this.setState({
       stats: output,
     });

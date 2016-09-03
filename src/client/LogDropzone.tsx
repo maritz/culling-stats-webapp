@@ -4,7 +4,7 @@ import { ICullingParser } from 'culling-log-parser';
 
 
 interface IProps {
-  onParsed: (output: ICullingParser.IParseLogOutput) => any;
+  onParsed: (output: ICullingParser.IParseLogResponseCloneable) => any;
 }
 
 interface IState {
@@ -53,14 +53,13 @@ export default class LogDropZone extends React.Component<IProps, IState> {
         }
         switch (event.data.type) {
           case 'started':
-            console.log('Starting to parse');
             this.setState({
               parsePercent: 1,
             } as IState);
             break;
           case 'progress':
             this.setState({
-              parsePercent: event.data.progress,
+              parsePercent: Math.floor(event.data.progress),
             } as IState);
             break;
           case 'done':
@@ -96,9 +95,9 @@ export default class LogDropZone extends React.Component<IProps, IState> {
 
 
   public render() {
-    let innerClassName = '';
+    let innerClassName = 'minimized well well-sm';
     if (!this.state.minimized) {
-      innerClassName += 'jumbotron';
+      innerClassName = 'well';
     }
     const loadingClass = this.state.isParsingLogs ? 'loader loading' : 'loader';
     const loadingBarWidthStyle = { width: `${this.state.parsePercent}%` };
@@ -117,11 +116,9 @@ export default class LogDropZone extends React.Component<IProps, IState> {
             <div className='progress-bar' role='progressbar'
               aria-valuenow={this.state.parsePercent} aria-valuemin='0'
               aria-valuemax='100' style={loadingBarWidthStyle}>
-              <span className='sr-only'>
-                0% Complete
-              </span>
+                {this.state.parsePercent}%
             </div>
-            { this.state.parsePercent >= 99 && <img className="grayFace" src='./images/GrayFaceNoSpace.png' /> }
+            { this.state.parsePercent >= 99 && <img className='grayFace' src='./images/GrayFaceNoSpace.png' /> }
           </div>
         </div>
         <div className={innerClassName}>
@@ -132,7 +129,6 @@ export default class LogDropZone extends React.Component<IProps, IState> {
               size={33} value='%localappdata%\\Victory\\Saved\\Logs' />
             <br/>
             These files will <b>not</b> be uploaded, they will be processed in your browser and then displayed.
-            <br/>
             When you leave this page, they are forgotten.
           </p>
         </div>
