@@ -37,5 +37,11 @@ body {
 }
 
 .dropzone.minimized {
-  font-size
+  font-size: 22px;
+}
+
+.dropzone .progress img.grayFace {
+  position: absolute;
+  left: 50%;
+  top: 0;
 }

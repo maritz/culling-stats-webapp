@@ -1,69 +1,32 @@
 import LogDropZone from './LogDropzone';
+import Stats from './Stats';
 import * as React from 'react';
+import { ICullingParser } from 'culling-log-parser';
 
 interface IProps {
 };
 
 interface IState {
-  isParsingLogs: boolean;
-  parsePercent: number;
+  stats: ICullingParser.IParseLogOutput | null;
 };
 
 export default class App extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
+    this.onParsed = this.onParsed.bind(this);
     this.state = {
-      isParsingLogs: false,
-      parsePercent: 0,
+      stats: null,
     };
   }
 
-  private onLogDropZonFiles(files: Array<File>) {
+  private onParsed(output: ICullingParser.IParseLogOutput) {
     this.setState({
-      isParsingLogs: true,
-    } as IState);
-    const worker = new Worker('/static/worker.js');
-    worker.postMessage(files);
-
-    worker.onmessage = (event: MessageEvent) => {
-      if (!event.data.type) {
-        console.error('Bad data from worker!');
-      }
-      switch (event.data.type) {
-        case 'started':
-          this.setState({
-            parsePercent: 1,
-          } as IState);
-          break;
-        case 'progress':
-          this.setState({
-            parsePercent: event.data.progress,
-          } as IState);
-          break;
-        case 'done':
-          console.log('Received data from worker:', event.data.done);
-          this.setState({
-            isParsingLogs: false,
-            parsePercent: 0,
-          });
-          break;
-        case 'error':
-          this.setState({
-            isParsingLogs: false,
-            parsePercent: 0,
-          });
-          console.error('Error from worker!', event.data.error);
-          break;
-        default:
-          console.error(`Unknown type '${event.data.type}' from worker!`);
-      }
-    };
+      stats: output,
+    });
   }
 
   public render() {
-    const loadingClass = this.state.isParsingLogs ? 'loader loading' : 'loader';
-    const loadingBarWidthStyle = { width: `${this.state.parsePercent}%` };
     return (
       <div id='content' className='container-fluid'>
         <div className='page-header'>
@@ -73,21 +36,10 @@ export default class App extends React.Component<IProps, IState> {
           </h1>
         </div>
         <div className='row'>
-          <LogDropZone onFiles={this.onLogDropZonFiles.bind(this)}>
-            <div className={loadingClass}>
-              <div className='progress'>
-                <div className='progress-bar' role='progressbar'
-                  aria-valuenow={this.state.parsePercent} aria-valuemin='0'
-                  aria-valuemax='100' style={loadingBarWidthStyle}>
-                  <span className='sr-only'>
-                    0% Complete
-                  </span>
-                </div>
-              </div>
-            </div>
+          <LogDropZone onParsed={this.onParsed}>
           </LogDropZone>
         </div>
-
+        <Stats stats={this.state.stats}/>
       </div>
     );
   }

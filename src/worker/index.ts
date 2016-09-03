@@ -1,4 +1,4 @@
-import parseLog from 'culling-log-parser';
+import { default as parseLog, DamageSummary, makeCloneable, ICullingParser } from 'culling-log-parser';
 
 // fake loading bar 4Head
 let fakeProgress = 0;
@@ -11,7 +11,7 @@ function fakeProgressIncrementor () {
 function handleFile(
   file: File,
   progressHandler: (this: FileReader, percent: number) => any,
-  successHandler: (this: FileReader, data: any) => any,
+  successHandler: (this: FileReader, data: ICullingParser.IParseLogOutput) => any,
   errorHandler: (this: FileReader, ev: ErrorEvent|Error) => any
 ): void {
   const reader = new FileReader();
@@ -31,9 +31,9 @@ function handleFile(
   };
 
   reader.onload = (event) => {
-    let result: any;
+    let result: ICullingParser.IParseLogOutput;
     try {
-      result = parseLog(reader.result, undefined);
+      result = parseLog(reader.result, { ignoreBots: true });
     } catch (e) {
       errorHandler.call(reader, e);
       return;
@@ -45,10 +45,35 @@ function handleFile(
 
 }
 
+function fastConcat(array: Array<any>, otherArray: Array<any>) {
+  otherArray.forEach((v) => array.push(v));
+}
+
 
 onmessage = (event) => {
 
   const files: Array<File> = event.data;
+
+  const totalResult: ICullingParser.IParseLogOutput = {
+    end: new Date(0),
+    entries: [],
+    games: [],
+    meta: {
+      lines: {
+        relevant: 0,
+        total: 0,
+      },
+    },
+    players: {},
+    start: new Date(),
+    summary: {
+      damage: new DamageSummary(),
+      deaths: 0,
+      kills: 0,
+      losses: 0,
+      wins: 0,
+    },
+  };
 
   const fileSerialHandler: any = (index: number) => {
     const arrayProgress = index / files.length * 100;
@@ -62,24 +87,57 @@ onmessage = (event) => {
         });
       },
 
-      (done) => {
-        index++;
-        if (files[index]) {
-          fileSerialHandler(index);
-          // todo: handle merging of data received.
-        } else {
-          try {
+      (output) => {
+        try {
+          let beforeLast = false;
+          if (output.start < totalResult.start) {
+            totalResult.start = output.start;
+            beforeLast = true;
+          }
+          if (output.end > totalResult.end) {
+            if (index > 0 && beforeLast) {
+              console.warn('A log file was before and after the already parsed output.', files[index - 1].name,
+                'output.end', output.end, 'output.start', output.start, 'totalResult.end', totalResult.end,
+                'totalResult.start', totalResult.start);
+            }
+            totalResult.end = output.end;
+          }
+
+          fastConcat(totalResult.entries, output.entries);
+          fastConcat(totalResult.games, output.games);
+          totalResult.meta.lines.relevant += output.meta.lines.relevant;
+          totalResult.meta.lines.total += output.meta.lines.total;
+
+          Object.keys(output.players).forEach((name) => {
+            if (!totalResult.players[name]) {
+              totalResult.players[name] = output.players[name];
+            } else {
+              totalResult.players[name].damage.addOtherSummary(output.players[name].damage);
+            }
+          });
+
+          totalResult.summary.damage.addOtherSummary(output.summary.damage);
+          totalResult.summary.deaths += output.summary.deaths;
+          totalResult.summary.kills += output.summary.kills;
+          totalResult.summary.losses += output.summary.losses;
+          totalResult.summary.wins += output.summary.wins;
+
+          index++;
+          if (files[index]) {
+            // get more files
+            fileSerialHandler(index);
+          } else {
             postMessage({
-              done,
+              output: makeCloneable(totalResult),
               type: 'done',
             });
-          } catch(error) {
-            postMessage({
-              error: error.message,
-              stack: error.stack,
-              type: 'error',
-            });
           }
+        } catch (error) {
+          postMessage({
+            error: error.message,
+            stack: error.stack,
+            type: 'error',
+          });
         }
       },
 
