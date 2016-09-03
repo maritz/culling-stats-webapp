@@ -52,7 +52,7 @@ If that doesn't help then report it as a bug, please! :-)`);
       isParsingLogs: true,
       parsePercent: 0,
     } as IState, () => {
-      const worker = new Worker('/static/worker.js');
+      const worker = new Worker('./worker.js');
       worker.postMessage(files);
 
       worker.onmessage = (event: MessageEvent) => {
