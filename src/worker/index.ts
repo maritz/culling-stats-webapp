@@ -109,14 +109,18 @@ onmessage = (event) => {
           totalResult.meta.lines.total += output.meta.lines.total;
 
           Object.keys(output.players).forEach((name) => {
-            if (!totalResult.players[name]) {
-              totalResult.players[name] = output.players[name];
+            let player = totalResult.players[name];
+            if (!player) {
+              player = output.players[name];
             } else {
-              totalResult.players[name].damage.addOtherSummary(output.players[name].damage);
+              player.damage = player.damage.addOtherSummary(output.players[name].damage);
+              player.killed += output.players[name].killed;
+              player.died += output.players[name].died;
+              player.timesMet += output.players[name].timesMet;
             }
           });
 
-          totalResult.summary.damage.addOtherSummary(output.summary.damage);
+          totalResult.summary.damage = totalResult.summary.damage.addOtherSummary(output.summary.damage);
           totalResult.summary.deaths += output.summary.deaths;
           totalResult.summary.kills += output.summary.kills;
           totalResult.summary.losses += output.summary.losses;
