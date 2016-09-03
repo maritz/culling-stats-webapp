@@ -5,7 +5,7 @@ import * as webpack from 'webpack';
 const app = express();
 
 if (process.env.NODE_ENV === 'production') {
-  app.use('/static', express.static(path.join(__dirname, 'docs')));
+  app.use('/', express.static(path.join(__dirname, 'docs')));
 } else {
 
   const config = require('./webpack.config.js');
@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === 'production') {
 
   app.use(require('webpack-hot-middleware')(compiler));
 
-  app.use('/static', express.static(path.join(__dirname, 'src', 'client')));
+  app.use('/', express.static(path.join(__dirname, 'src', 'client')));
 }
 
 app.listen(3040, '0.0.0.0', (err: Error | string) => {
