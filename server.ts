@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === 'production') {
   app.use('/', express.static(path.join(__dirname, 'src', 'client')));
 }
 
-app.listen(3040, '0.0.0.0', (err: Error | string) => {
+app.listen(3041, 'localhost', (err: Error | string) => {
   if (err) {
     console.log(err);
     return;
@@ -29,3 +29,17 @@ app.listen(3040, '0.0.0.0', (err: Error | string) => {
 
   console.log('Listening at http://0.0.0.0:3040');
 });
+
+// require the module as normal
+const bs = require('browser-sync').create();
+
+// .init starts the server
+bs.init({
+  files: [path.join(__dirname, 'src', 'client', 'style.css')],
+  host: '0.0.0.0',
+  port: 3040,
+  proxy: 'http://localhost:3041',
+  ui: false,
+  open: false,
+});
+
