@@ -52,7 +52,9 @@
   background-color: #46b8da;
 }
 .dropzoneRejected > div  {
-  background-color: #ec4844;
+  background-color: #46b8da;
+  /* Due to a bug in the handling in react-dropzone or chrome or something, all files are marked as rejected in chrome during drag */
+  /*background-color: #ec4844;*/
 }
 
 .dropzone input[readonly] {
