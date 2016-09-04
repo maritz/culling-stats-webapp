@@ -35,6 +35,11 @@ export default class Stats extends React.Component<IProps, IState> {
                   </li>
                   <li>
                     <a href='#' onClick={this.onClick}>
+                      Damage
+                    </a>
+                  </li>
+                  <li>
+                    <a href='#' onClick={this.onClick}>
                       Games
                     </a>
                   </li>

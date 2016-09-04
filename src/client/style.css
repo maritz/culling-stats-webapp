@@ -79,3 +79,8 @@
 .stats .summary .damage .dl-horizontal dd {
   margin-left: 220px;
 }
+
+.stats .summary .damage .dl-horizontal dd,
+.stats .summary .damage .dl-horizontal dt {
+  line-height: 1.6;
+}
