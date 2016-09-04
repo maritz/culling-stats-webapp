@@ -15,11 +15,13 @@ export default class Summary extends React.Component<IProps, IState> {
   }
 
   public render(): JSX.Element {
-    const totalAttacksReceived = this.props.stats.summary.damage.received.count;
     const attacksBlocked = (this.props.stats.summary.damage.received.meleeBlockCount +
-      this.props.stats.summary.damage.received.meleeBlockCount);
+      this.props.stats.summary.damage.received.rangeBlockCount);
+    const percentMeleeBlocked = (this.props.stats.summary.damage.melee.received.meleeBlockCount
+      * 100 / this.props.stats.summary.damage.melee.received.amount);
+    const totalAttacksReceived = this.props.stats.summary.damage.received.count + attacksBlocked;
     return (
-      <div className='row'>
+      <div className='row summary'>
         <div className='col-sm-6 col-md-4'>
           <div className='well'>
             <h2>General</h2>
@@ -40,25 +42,27 @@ export default class Summary extends React.Component<IProps, IState> {
           </div>
         </div>
         <div className='col-sm-6 col-md-4'>
-          <div className='well'>
+          <div className='well damage'>
             <h2>Damage</h2>
             <dl className='dl-horizontal'>
               <dt>Dealt to others</dt>
               <dd>{this.props.stats.summary.damage.dealt.amount}</dd>
               <dt>Received from others</dt>
               <dd>{this.props.stats.summary.damage.received.amount}</dd>
-              <dt>Attacks blocked</dt>
+              <dt>Attacks received <small>(melee and ranged)</small></dt>
+              <dd>{totalAttacksReceived}</dd>
+              <dt>Attacks blocked <small>(melee and ranged)</small></dt>
               <dd>{attacksBlocked}</dd>
-              <dt>Block rate (total attacks received / total attacks blocked)</dt>
-              <dd>{(totalAttacksReceived / attacksBlocked).toFixed(2)}</dd>
-              <dt>Melee hits block</dt>
+              <dt>Melee attacks blocked</dt>
+              <dd>{percentMeleeBlocked.toFixed(2)}%</dd>
+              <dt>You hitting a block</dt>
               <dd>{this.props.stats.summary.damage.dealt.meleeBlockCount}</dd>
-              <dt>Range attacks blocked</dt>
+              <dt>Range attacks blocked <small>(reduces 50% damage)</small></dt>
               <dd>{this.props.stats.summary.damage.received.rangeBlockCount}</dd>
             </dl>
           </div>
         </div>
-        <div className='col-sm-12 col-md-4'>
+        <div className='col-sm-12 col-md-3'>
           <div className='well'>
             <h2>Streaks</h2>
             <dl className=''>

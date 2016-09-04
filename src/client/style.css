@@ -67,3 +67,15 @@
   left: 50%;
   top: 0;
 }
+
+
+.stats .summary .dl-horizontal dt {
+  white-space: normal;
+}
+
+.stats .summary .damage .dl-horizontal dt {
+  width: 200px;
+}
+.stats .summary .damage .dl-horizontal dd {
+  margin-left: 220px;
+}

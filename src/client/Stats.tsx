@@ -48,7 +48,7 @@ export default class Stats extends React.Component<IProps, IState> {
             </div>
           </div>
           <div className='row'>
-            <div className='col-lg-12'>
+            <div className='col-lg-12 stats'>
               <Summary stats={this.props.stats}/>
             </div>
           </div>
