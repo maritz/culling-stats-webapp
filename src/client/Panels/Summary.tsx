@@ -18,7 +18,9 @@ export default class Summary extends React.Component<IProps, IState> {
     const attacksBlocked = (this.props.stats.summary.damage.received.meleeBlockCount +
       this.props.stats.summary.damage.received.rangeBlockCount);
     const percentMeleeBlocked = (this.props.stats.summary.damage.melee.received.meleeBlockCount
-      * 100 / this.props.stats.summary.damage.melee.received.amount);
+      * 100 / this.props.stats.summary.damage.melee.received.count);
+    const percentMeleeBlocksHit = (this.props.stats.summary.damage.melee.dealt.meleeBlockCount
+      * 100 / this.props.stats.summary.damage.melee.dealt.count);
     const totalAttacksReceived = this.props.stats.summary.damage.received.count + attacksBlocked;
     return (
       <div className='row summary'>
@@ -55,8 +57,8 @@ export default class Summary extends React.Component<IProps, IState> {
               <dd>{attacksBlocked}</dd>
               <dt>Melee attacks blocked</dt>
               <dd>{percentMeleeBlocked.toFixed(2)}%</dd>
-              <dt>You hitting a block</dt>
-              <dd>{this.props.stats.summary.damage.dealt.meleeBlockCount}</dd>
+              <dt>Blocks melee attacked <small>(you got stunned)</small></dt>
+              <dd>{percentMeleeBlocksHit.toFixed(2)}%</dd>
               <dt>Range attacks blocked <small>(reduces 50% damage)</small></dt>
               <dd>{this.props.stats.summary.damage.received.rangeBlockCount}</dd>
             </dl>
