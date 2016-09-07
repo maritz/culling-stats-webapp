@@ -201,6 +201,16 @@ export default class Summary extends React.Component<IProps, IState> {
             </p>
           </div>
         </div>
+        <div className="col-sm-12">
+          <div className="well">
+            <p>
+              Keep in mind that wins, losses, kills and deaths can only be counted when they are logged as such.
+              <br />Wins and losses were added towards the end of April, but appear to be spotty/unreliable for a while.
+              <br/>At some point in June a patch was released that fixed this and at that point these stats become a lot more accurate. (nearly 100% for me)
+              <br />If you go to the Games section, you can look through your games and see exactly where it started to get reliable with these stats.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
