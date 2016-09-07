@@ -1,5 +1,5 @@
 
-#content > .row .loader {
+#react-container > div > .row .loader {
   display: none;
 
   background: rgba(200, 200, 200, 0.9);
@@ -10,11 +10,11 @@
   right: 0;
   z-index: 1; /* otherwise the input overlays it?!!?! oO */
 }
-#content > .row .loader.loading {
+#react-container > div > .row .loader.loading {
   display: block;
 }
 
-#content > .row .loader.loading .progress {
+#react-container > div > .row .loader.loading .progress {
   position: absolute;
   margin-top: -11px;
   top: 50%;
@@ -73,14 +73,42 @@
   white-space: normal;
 }
 
-.stats .summary .damage .dl-horizontal dt {
+.stats .damage .explanation h3 {
+  margin-top: 10px;
+  font-size: 16pt;
+}
+.stats .damage .explanation p {
+  font-size: 10pt;
+}
+.stats .damage .explanation small {
+  font-size: 8pt;
+}
+
+.stats .damage .dl-horizontal dt {
   width: 200px;
 }
-.stats .summary .damage .dl-horizontal dd {
+.stats .damage .dl-horizontal dd {
   margin-left: 220px;
 }
 
 .stats .summary .damage .dl-horizontal dd,
 .stats .summary .damage .dl-horizontal dt {
   line-height: 1.6;
+}
+
+.stats .games .table-striped > tbody > tr.selected-via-id {
+  background-color: #616161;
+}
+
+.stats .games .glyphicon.glyphicon-remove {
+  color: #a91818;
+  margin-right: 4px;
+}
+.stats .games .glyphicon.glyphicon-ok {
+  color: #2ab929;
+  margin-right: 4px;
+}
+
+footer iframe {
+  margin: 0 10px;
 }

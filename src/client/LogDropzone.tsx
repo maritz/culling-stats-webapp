@@ -148,6 +148,12 @@ If that doesn't help then report it as a bug, please! :-)`);
             These files will <b>not</b> be uploaded, they will be processed in your browser and then displayed.
             When you leave this page, they are forgotten.
           </p>
+          <p className='lead'>
+            Victory.log filess get closed when you close the game and then moved to Victory-backup-%date%.log.
+            <br/>
+            So if you want to see all your stats, drop <b>all</b> the log files at once.
+            <small><small> (may take a while to parse)</small></small>
+          </p>
         </div>
       </Dropzone>
     );

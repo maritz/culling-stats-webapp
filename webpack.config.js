@@ -2,10 +2,9 @@ const path = require('path');
 const webpack = require('webpack');
 
 const production = process.env.NODE_ENV === 'production';
-const staging = process.env.node_ENV === 'staging';
 
 const clientFiles = ['./src/client/index.tsx'];
-if (!production && !staging) {
+if (!production) {
   clientFiles.unshift('webpack-hot-middleware/client');
 }
 
@@ -54,7 +53,7 @@ module.exports = {
     ]
   },
   plugins:
-    production || staging
+    production
       ? []
       : [ new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin() ]

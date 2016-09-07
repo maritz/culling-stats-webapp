@@ -1,4 +1,5 @@
 import { default as parseLog, DamageSummary, makeCloneable, ICullingParser } from 'culling-log-parser';
+import { fastConcat, sortGamesByStart } from '../utils';
 
 // fake loading bar 4Head
 let fakeProgress = 0;
@@ -42,11 +43,6 @@ function handleFile(
   };
 
   reader.onerror = errorHandler;
-
-}
-
-function fastConcat(array: Array<any>, otherArray: Array<any>) {
-  otherArray.forEach((v) => array.push(v));
 }
 
 
@@ -58,10 +54,13 @@ onmessage = (event) => {
     entries: [],
     games: [],
     meta: {
+      errors: [],
       lines: {
         relevant: 0,
         total: 0,
       },
+      version: 0,
+      warnings: [],
     },
     players: {},
     start: new Date(),
@@ -110,7 +109,7 @@ onmessage = (event) => {
           Object.keys(output.players).forEach((name) => {
             let player = totalResult.players[name];
             if (!player) {
-              player = output.players[name];
+              totalResult.players[name] = player = output.players[name];
             } else {
               player.damage = player.damage.addOtherSummary(output.players[name].damage);
               player.killed += output.players[name].killed;
@@ -124,12 +123,15 @@ onmessage = (event) => {
           totalResult.summary.kills += output.summary.kills;
           totalResult.summary.losses += output.summary.losses;
           totalResult.summary.wins += output.summary.wins;
+          fastConcat(totalResult.meta.errors, output.meta.errors);
+          fastConcat(totalResult.meta.warnings, output.meta.warnings);
 
           index++;
           if (files[index]) {
             // get more files
             fileSerialHandler(index);
           } else {
+            totalResult.games.sort(sortGamesByStart);
             postMessage({
               output: makeCloneable(totalResult),
               type: 'done',

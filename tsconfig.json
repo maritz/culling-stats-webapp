@@ -8,6 +8,7 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
+    "suppressImplicitAnyIndexErrors": true,
     "jsx": "react"
   },
   "exclude": [

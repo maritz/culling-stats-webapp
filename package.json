@@ -33,8 +33,10 @@
     "webpack-hot-middleware": "^2.12.2"
   },
   "dependencies": {
+    "lodash": "^4.15.0",
     "react": "^15.3.1",
     "react-bootstrap-table": "^2.5.0",
-    "react-dropzone": "^3.5.3"
+    "react-dropzone": "^3.5.3",
+    "react-router": "^2.7.0"
   }
 }

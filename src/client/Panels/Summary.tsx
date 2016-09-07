@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ICullingParser } from 'culling-log-parser';
+import { Link } from 'react-router';
 
 interface IProps {
   stats: ICullingParser.IParseLogResponseCloneable;
@@ -20,27 +21,95 @@ export default class Summary extends React.Component<IProps, IState> {
     const percentMeleeBlocksHit = (this.props.stats.summary.damage.melee.dealt.meleeBlockCount
       * 100 / this.props.stats.summary.damage.melee.dealt.count);
 
-    let highestDamage = (<div></div>);
-    if (this.props.stats.entries.length > 0) {
-      const highestDamageEntry = this.props.stats.entries.reduce(
-        (prev, cur) => cur.damage.dealt > prev.damage.dealt ? cur : prev
-      );
-
-      let highestDamageType = 'with your fists!';
-      if (highestDamageEntry.damage.isBackstab) {
-        highestDamageType = 'by stabbing him in the back... you dirty monster!';
-      } else if (highestDamageEntry.damage.isHeadshot) {
-        highestDamageType = 'by blowing his head off. Who cleaned that up?';
-      } else if (highestDamageEntry.damage.dealt > 25) {
-        highestDamageType += ' (probably not)';
-      }
-
-      highestDamage = (
-        <dd>
-          {highestDamageEntry.damage.dealt} to "{highestDamageEntry.otherPlayer.substr(0, 5)}..." {highestDamageType}
-        </dd>
-      );
+    let kdr = (this.props.stats.summary.kills / this.props.stats.summary.deaths).toFixed(2);
+    if (this.props.stats.summary.deaths === 0) {
+      kdr = 'no deaths! PogChamp';
     }
+
+    // Games come presorted from the worker
+    type streakObj = {
+      current: number,
+      currentRunning: boolean,
+      currentStart: Date,
+      currentStartIndex: number,
+      index: number,
+      longest: number,
+      start: Date,
+    };
+    const winStreak: streakObj = {
+      current: 0,
+      currentRunning: false,
+      currentStart: this.props.stats.games[0].start,
+      currentStartIndex: 0,
+      index: 0,
+      longest: 0,
+      start: this.props.stats.games[0].start,
+    };
+    const lossStreak: streakObj = Object.assign({}, winStreak);
+    const killStreak: streakObj = Object.assign({}, winStreak);
+    const zeroKillStreak: streakObj = Object.assign({}, winStreak);
+
+    const streakCounter = (
+      game: ICullingParser.IGame,
+      index: number,
+      streakObj: streakObj,
+      incrementTest: (game: ICullingParser.IGame) => boolean,
+    ) => {
+      if (incrementTest(game)) {
+        if (streakObj.currentRunning === false) {
+          streakObj.currentStart = game.start;
+          streakObj.currentStartIndex = index;
+          streakObj.currentRunning = true;
+        }
+        streakObj.current++;
+        if (streakObj.current > streakObj.longest) {
+          streakObj.longest = streakObj.current;
+          streakObj.start = streakObj.currentStart;
+          streakObj.index = streakObj.currentStartIndex;
+        }
+      } else {
+        streakObj.current = 0;
+        streakObj.currentRunning = false;
+      }
+    };
+    let startZeroKillCounter = false;
+
+    this.props.stats.games.forEach(
+      (game: ICullingParser.IGame, index: number) => {
+        if (!(game.isWin || game.isLoss)) {
+          winStreak.current = 0;
+          winStreak.currentRunning = false;
+          lossStreak.current = 0;
+          lossStreak.currentRunning = false;
+          return;
+        }
+        streakCounter(game, index, winStreak, (innerGame) => innerGame.isWin);
+        streakCounter(game, index, lossStreak, (innerGame) => innerGame.isLoss);
+        if (startZeroKillCounter) {
+          streakCounter(game, index, zeroKillStreak, (innerGame) => innerGame.kills === 0);
+        }
+
+        if (game.kills > 0) {
+          startZeroKillCounter = true;
+          if (killStreak.currentRunning === false) {
+            killStreak.currentStart = game.start;
+            killStreak.currentStartIndex = index;
+            killStreak.currentRunning = true;
+          }
+          killStreak.current += game.kills;
+          if (killStreak.current > killStreak.longest) {
+            killStreak.longest = killStreak.current;
+            killStreak.start = game.start;
+            killStreak.index = killStreak.currentStartIndex;
+          }
+        }
+        if (game.isLoss) {
+          killStreak.current = 0;
+          killStreak.currentRunning = false;
+        }
+      }
+    );
+
     return (
       <div className='row summary'>
         <div className='col-sm-6 col-md-4'>
@@ -58,7 +127,7 @@ export default class Summary extends React.Component<IProps, IState> {
               <dt>Deaths</dt>
               <dd>{this.props.stats.summary.deaths}</dd>
               <dt>Kills per Death</dt>
-              <dd>{(this.props.stats.summary.kills / this.props.stats.summary.deaths).toFixed(10)}</dd>
+              <dd>{kdr}</dd>
               <dt>Backstabs</dt>
               <dd>{this.props.stats.summary.damage.dealt.backstabCount}</dd>
               <dt>Headshots</dt>
@@ -66,7 +135,7 @@ export default class Summary extends React.Component<IProps, IState> {
             </dl>
           </div>
         </div>
-        <div className='col-sm-6 col-md-5'>
+        <div className='col-sm-6 col-md-4'>
           <div className='well damage'>
             <h2>Damage</h2>
             <dl className='dl-horizontal'>
@@ -80,24 +149,56 @@ export default class Summary extends React.Component<IProps, IState> {
               <dd>{percentMeleeBlocksHit.toFixed(1)} %</dd>
               <dt>Range attacks blocked <br/><small>(reduces 50% damage)</small></dt>
               <dd>{this.props.stats.summary.damage.received.rangeBlockCount}</dd>
-              <dt>Highest damage dealt</dt>
-              {highestDamage}
             </dl>
           </div>
         </div>
-        <div className='col-sm-12 col-md-3'>
+        <div className='col-sm-12 col-md-4'>
           <div className='well'>
             <h2>Streaks</h2>
             <dl className=''>
               <dt>Longest Win Streak</dt>
-              <dd>soon™</dd>
-              <dt>Longest Loosing Streak</dt>
-              <dd>soon™</dd>
-              <dt>Longest Kill Streak</dt>
-              <dd>soon™</dd>
-              <dt>Most games without a single kill</dt>
-              <dd>soon™</dd>
+              <dd>
+                {winStreak.longest}&nbsp;
+                <small>
+                  <Link to={`games/${winStreak.index}`}>
+                    ({winStreak.start.toLocaleString()})
+                  </Link>
+                </small>
+              </dd>
+              <dt>
+                Longest Losing Streak
+              </dt>
+              <dd>
+                {lossStreak.longest}&nbsp;
+                <small>
+                  <Link to={`games/${lossStreak.index}`}>
+                    ({lossStreak.start.toLocaleString()})
+                  </Link>
+                </small>
+              </dd>
+              <dt>
+                Longest Kill Streak
+                <br/>
+              </dt>
+              <dd>{killStreak.longest}&nbsp;
+                <small>
+                  <Link to={`games/${killStreak.index}`}>
+                    ({killStreak.start.toLocaleString()})
+                  </Link>
+                </small>
+              </dd>
+              <dt>Most games in a row without a single kill</dt>
+              <dd>{zeroKillStreak.longest}&nbsp;
+                <small>
+                  <Link to={`games/${zeroKillStreak.index}`}>
+                    ({zeroKillStreak.start.toLocaleString()})
+                  </Link>
+                </small>
+              </dd>
             </dl>
+            <p>
+              Games that do not have rankscoring win/loss do not count and stop streaks!
+            </p>
           </div>
         </div>
       </div>
