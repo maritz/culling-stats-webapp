@@ -1,6 +1,6 @@
 {
   "name": "culling-stats-webapp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Webapp that can take culling logs, parses them and displays some stats",
   "main": "dist/server.js",
   "scripts": {
