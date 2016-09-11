@@ -3,6 +3,19 @@ import * as React from 'react';
 import { ICullingParser } from 'culling-log-parser';
 import { withRouter, IRouter } from 'react-router';
 import { ICompiledStatsSummary } from '../interfaces';
+import * as semver from 'semver';
+
+declare module 'react-notify-toast';
+import Notifications, { notify } from 'react-notify-toast';
+
+const currentVersion = '1.1.0';
+const lastUsedVersion = localStorage.getItem('lastUsedVersion');
+let showVersionHint = false;
+if (lastUsedVersion && semver.gt(currentVersion, lastUsedVersion)) {
+  showVersionHint = true;
+} else if (!lastUsedVersion) {
+  localStorage.setItem('lastUsedVersion', currentVersion);
+}
 
 interface IProps {
   router: IRouter;
@@ -39,9 +52,28 @@ export default withRouter(class App extends React.Component<IProps, IState> {
     this.props.router.push('/summary');
   }
 
+  public componentDidMount() {
+    if (showVersionHint) {
+      showVersionHint = false;
+      notify.show((
+        <p className='version-notification success'>
+          A new version has been released.
+          <br/>
+          You can find&nbsp;
+          <a target='blank'
+            href='https://github.com/maritz/culling-stats-webapp/blob/master/CHANGELOG.md'>
+            the changelog here
+          </a>
+        </p>
+      ), 'success', 8000);
+      localStorage.setItem('lastUsedVersion', currentVersion);
+    }
+  }
+
   public render() {
     return (
       <div>
+        <Notifications />
         <div className='row'>
           <LogDropZone onParsed={this.onParsed} onGamesParsed={this.onGamesParsed}>
           </LogDropZone>
