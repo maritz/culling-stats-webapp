@@ -112,3 +112,14 @@
 footer iframe {
   margin: 0 10px;
 }
+
+.toast-notification > span {
+  display: inline-block !important;
+  margin-top: -10px;
+  color: darkgray;
+}
+
+.version-notification a {
+  color: black;
+  text-decoration-style: dotted;
+}
