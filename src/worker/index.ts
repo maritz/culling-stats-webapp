@@ -1,5 +1,6 @@
 import { default as parseLog, DamageSummary, makeCloneable, ICullingParser } from 'culling-log-parser';
-import { fastConcat, sortGamesByStart } from '../utils';
+import { fastConcat } from '../utils';
+import { ICompiledStatsSummary } from '../interfaces';
 
 // fake loading bar 4Head
 let fakeProgress = 0;
@@ -49,10 +50,10 @@ function handleFile(
 onmessage = (event) => {
   const files: Array<File> = event.data;
 
-  const totalResult: ICullingParser.IParseLogOutput = {
+  const totalResult: ICompiledStatsSummary = {
     end: new Date(0),
-    entries: [],
     games: [],
+    highestDamageEntry: {} as ICullingParser.ILogEntry,
     meta: {
       errors: [],
       lines: {
@@ -87,22 +88,17 @@ onmessage = (event) => {
 
       (output) => {
         try {
-          let beforeLast = false;
           if (output.start < totalResult.start) {
             totalResult.start = output.start;
-            beforeLast = true;
           }
           if (output.end > totalResult.end) {
-            if (index > 0 && beforeLast) {
-              console.warn('A log file was before and after the already parsed output.', files[index - 1].name,
-                'output.end', output.end, 'output.start', output.start, 'totalResult.end', totalResult.end,
-                'totalResult.start', totalResult.start);
-            }
             totalResult.end = output.end;
           }
 
-          fastConcat(totalResult.entries, output.entries);
-          fastConcat(totalResult.games, output.games);
+          postMessage({
+            games: output.games,
+            type: 'games',
+          });
           totalResult.meta.lines.relevant += output.meta.lines.relevant;
           totalResult.meta.lines.total += output.meta.lines.total;
 
@@ -112,8 +108,6 @@ onmessage = (event) => {
               totalResult.players[name] = player = output.players[name];
             } else {
               player.damage = player.damage.addOtherSummary(output.players[name].damage);
-              player.killed += output.players[name].killed;
-              player.died += output.players[name].died;
               player.timesMet += output.players[name].timesMet;
             }
           });
@@ -131,7 +125,6 @@ onmessage = (event) => {
             // get more files
             fileSerialHandler(index);
           } else {
-            totalResult.games.sort(sortGamesByStart);
             postMessage({
               output: makeCloneable(totalResult),
               type: 'done',

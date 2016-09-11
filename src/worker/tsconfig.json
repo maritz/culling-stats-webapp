@@ -8,6 +8,7 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
+    "noEmit": true,
     "lib": [
       "es6", "webworker"
     ]

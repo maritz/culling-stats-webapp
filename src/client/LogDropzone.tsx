@@ -1,10 +1,12 @@
 import * as React from 'react';
 import * as Dropzone from 'react-dropzone';
 import { ICullingParser } from 'culling-log-parser';
+import { ICompiledStatsSummary } from '../interfaces';
 
 
 interface IProps {
-  onParsed: (output: ICullingParser.IParseLogResponseCloneable) => any;
+  onParsed: (output: ICompiledStatsSummary) => any;
+  onGamesParsed: (output: Array<ICullingParser.IGame>) => any;
 }
 
 interface IState {
@@ -69,6 +71,9 @@ If that doesn't help then report it as a bug, please! :-)`);
             this.setState({
               parsePercent: Math.floor(event.data.progress),
             } as IState);
+            break;
+          case 'games':
+            this.props.onGamesParsed(event.data.games);
             break;
           case 'done':
             this.setState({
